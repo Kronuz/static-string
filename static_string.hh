@@ -77,6 +77,11 @@ template <std::size_t N>
 class static_string<N, literal_ref> {
 	const char (&_data)[N + 1];
 
+	// Cross-type comparison operators (operator== / operator<) read the other
+	// specialization's private _data, so every static_string is a friend of every
+	// other.
+	template <std::size_t, typename> friend class static_string;
+
 public:
 	constexpr static_string(const char (&data)[N + 1])
 	  : _data{(constexpr_assert(data[N] == 0), data)} { }
@@ -153,6 +158,11 @@ char_to_string() {
 template <std::size_t N>
 class static_string<N, char_array> {
 	char _data[N + 1];
+
+	// Cross-type comparison operators (operator== / operator<) read the other
+	// specialization's private _data, so every static_string is a friend of every
+	// other.
+	template <std::size_t, typename> friend class static_string;
 
 	struct private_ctor {};
 
