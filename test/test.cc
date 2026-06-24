@@ -26,6 +26,15 @@ int main() {
 	static_assert(ss::string("abc") == ss::string("abc"), "eq");
 	static_assert(!(ss::string("abc") == ss::string("abd")), "neq");
 
+#if defined(__cpp_lib_format)
+	// Built as C++20: static_string formats directly with std::format.
+	{
+		auto s = std::format("[{}]", greeting);
+		assert(s == "[Hello, world!]");
+		std::printf("static-string std::format OK: %s\n", s.c_str());
+	}
+#endif
+
 	std::printf("static-string OK: \"%s\" (size %zu), to_string<2025>=%s\n",
 	            greeting.c_str(), greeting.size(), n.c_str());
 	return 0;

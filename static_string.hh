@@ -37,13 +37,13 @@
 #include <type_traits>
 #include <utility>
 
-// Optional {fmt} formatter (a convenience: static_string also converts
-// implicitly to std::string_view, which fmt and std::format already handle).
-// Enabled automatically when <fmt/format.h> is available, or with
-// STATIC_STRING_WITH_FMT; disable with STATIC_STRING_NO_FMT.
-#if !defined(STATIC_STRING_NO_FMT) && (defined(STATIC_STRING_WITH_FMT) || __has_include(<fmt/format.h>))
-#  include <fmt/format.h>     // for fmt::formatter
-#  define STATIC_STRING_HAS_FMT 1
+// Optional std::format support: when compiled as C++20 (with <format>), provide
+// a std::formatter so static_string values work directly in std::format(...).
+// It is only a convenience; static_string also converts implicitly to
+// std::string_view. Disable with STATIC_STRING_NO_FORMAT.
+#if !defined(STATIC_STRING_NO_FORMAT) && defined(__cpp_lib_format) && __has_include(<format>)
+#  include <format>
+#  define STATIC_STRING_HAS_FORMAT 1
 #endif
 
 
@@ -287,11 +287,11 @@ std::string operator+(const TL& l, const static_string<NR, TR>& r)
 } // namespace static_string
 
 
-#ifdef STATIC_STRING_HAS_FMT
+#ifdef STATIC_STRING_HAS_FORMAT
 template <std::size_t N, typename T>
-struct fmt::formatter<static_string::static_string<N, T>> : fmt::formatter<std::string_view> {
-	auto format(const static_string::static_string<N, T>& val, format_context& ctx) {
-		return fmt::formatter<std::string_view>::format(std::string_view(val.data(), val.size()), ctx);
+struct std::formatter<static_string::static_string<N, T>> : std::formatter<std::string_view> {
+	auto format(const static_string::static_string<N, T>& val, std::format_context& ctx) const {
+		return std::formatter<std::string_view>::format(std::string_view(val.data(), val.size()), ctx);
 	}
 };
 #endif
