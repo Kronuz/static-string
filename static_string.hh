@@ -126,16 +126,38 @@ struct chars_to_string {
 	constexpr static char value[N + 1]{a..., 0};
 };
 
-template <int num, std::size_t N = 0, char... a>
-struct explode : explode<num / 10, N + 1, ('0' + num % 10), a...> { };
+// explode<num, neg> renders an integer into a null-terminated char array.
+//
+// It never negates num, so the most-negative value (INT_MIN) is handled safely:
+// forming -INT_MIN would overflow, but we never do. Each digit is the absolute
+// value of num % 10 (num % 10 is <= 0 when num < 0, so we flip its sign there),
+// and the recursion divides toward 0 the same way for both signs.
+//
+// The `neg` flag is fixed at the top-level entry (see to_string) and threaded
+// down unchanged through the recursion; the terminal case prepends '-' when it
+// is set, so the sign char ends up at the front of value[] and the array size
+// accounts for it. Each recursive step prepends a digit to the char pack a...,
+// so digits accumulate most-significant-first as num shrinks toward 0.
+template <int num, bool neg = (num < 0), std::size_t N = 0, char... a>
+struct explode : explode<num / 10, neg, N + 1, ('0' + (num % 10 < 0 ? -(num % 10) : num % 10)), a...> { };
 
+// Terminal for non-negative values: emit the accumulated digits as-is.
 template <std::size_t N, char... a>
-struct explode<0, N, a...> {
+struct explode<0, false, N, a...> {
 	constexpr static char value[N + 1]{a..., 0};
 };
 
+// Terminal for negative values: prepend '-' to the digits and grow the array by
+// one to account for the sign char.
+template <std::size_t N, char... a>
+struct explode<0, true, N, a...> {
+	constexpr static char value[N + 2]{'-', a..., 0};
+};
+
+// Zero itself: no digits were ever pushed, so emit "0" directly. (num == 0 is
+// never negative, so neg is always false here.)
 template <>
-struct explode<0, 0> {
+struct explode<0, false, 0> {
 	constexpr static char value[2]{'0', 0};
 };
 

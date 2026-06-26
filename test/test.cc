@@ -18,6 +18,11 @@ int main() {
 	constexpr auto n = ss::to_string<2025>();
 	assert(std::strcmp(n.c_str(), "2025") == 0);
 
+	// Negative integers (regression: to_string used to corrupt the sign).
+	static_assert(ss::to_string<-5>() == ss::string("-5"), "to_string<-5>");
+	static_assert(ss::to_string<-123>() == ss::string("-123"), "to_string<-123>");
+	static_assert(ss::to_string<0>() == ss::string("0"), "to_string<0>");
+
 	// Concatenate with a raw string literal.
 	constexpr auto path = ss::string("/usr") + "/local";
 	assert(std::string_view(path) == "/usr/local");
