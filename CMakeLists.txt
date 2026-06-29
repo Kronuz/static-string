@@ -15,4 +15,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   add_executable(static_string_test test/test.cc)
   target_link_libraries(static_string_test PRIVATE static_string)
   add_test(NAME static_string COMMAND static_string_test)
+
+  # A runnable tour of the library (not a test): build & run ./build/static_string_demo
+  add_executable(static_string_demo examples/demo.cc)
+  target_link_libraries(static_string_demo PRIVATE static_string)
 endif()

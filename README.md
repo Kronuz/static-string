@@ -248,6 +248,22 @@ without `NDEBUG`. Requires a C++17 compiler.
   `std::string_view` conversion already lets `std::format` print a
   `static_string`.
 
+## Examples
+
+[`examples/demo.cc`](examples/demo.cc) is a runnable tour, built by a top-level
+CMake build:
+
+```sh
+cmake -B build && cmake --build build && ./build/static_string_demo
+```
+
+It folds a `string("hello") + " " + string("world")` concatenation into one
+constant (whose length is fixed in its type), uses `static_assert` to prove the
+equality and lexicographic comparison ran in the compiler, renders integers with
+`to_string<N>()` (including a signed value), stitches a real `\e[38;2;255;0;0m`
+ANSI escape the way `ansi_color.hh` does, and then crosses into runtime to hand
+the same bytes to `string_view`, `std::string`, and `std::format`.
+
 ## Provenance
 
 Extracted from [Xapiand](https://github.com/Kronuz/Xapiand), where it is vendored
