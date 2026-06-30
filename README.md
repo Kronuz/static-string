@@ -1,5 +1,7 @@
 # static-string
 
+![constexpr](https://img.shields.io/badge/constexpr-compile--time-blue)
+
 A header-only, constexpr compile-time string for C++17.
 
 ## What it is
