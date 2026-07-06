@@ -41,7 +41,18 @@
 // a std::formatter so static_string values work directly in std::format(...).
 // It is only a convenience; static_string also converts implicitly to
 // std::string_view. Disable with STATIC_STRING_NO_FORMAT.
-#if !defined(STATIC_STRING_NO_FORMAT) && defined(__cpp_lib_format) && __has_include(<format>)
+//
+// The gate is deliberately C++20 + <format> existing, NOT a pre-defined
+// __cpp_lib_format: that feature-test macro is only set once a standard header
+// (<version>/<format>) has been included, so gating on it made the formatter
+// depend on include order. If this header was pulled in before anything included
+// <format> (e.g. via the compile-time color headers), the macro was still
+// undefined here, the formatter was skipped, and the include guard then blocked
+// it from ever being added -- even though a later <format> user in the same TU
+// (strings::format -> std::vformat) needs a static_string formatter. Including
+// <format> ourselves under a plain C++20 + __has_include check makes the
+// formatter present whenever std::format is usable, regardless of ordering.
+#if !defined(STATIC_STRING_NO_FORMAT) && (__cplusplus >= 202002L) && __has_include(<format>)
 #  include <format>
 #  define STATIC_STRING_HAS_FORMAT 1
 #endif
