@@ -1,5 +1,7 @@
 # static-string
 
+[![CI](https://github.com/Kronuz/static-string/actions/workflows/ci.yml/badge.svg)](https://github.com/Kronuz/static-string/actions/workflows/ci.yml)
+
 ![constexpr](https://img.shields.io/badge/constexpr-compile--time-blue)
 
 A header-only, constexpr compile-time string for C++17.
