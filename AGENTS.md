@@ -10,18 +10,22 @@ Notes for agents and contributors working in this repo.
   operators, and an optional `std::formatter` (C++20). Header-only.
 - `test/test.cc` — smoke test exercising compile-time concatenation,
   `to_string<2025>()`, raw-literal mixing, and `constexpr` comparison.
-- `CMakeLists.txt` — defines the `static_string` `INTERFACE` target and a
+- `CMakeLists.txt` — defines the `static_string` `INTERFACE` target (alias
+  `static_string::static_string`) and a
   `ctest` test (built only when this repo is top-level).
 - `LICENSE` — Boost Software License 1.0; dual copyright (Dubalu LLC and
   Andrzej Krzemienski).
-- `README.md` — usage and API reference.
+- `README.md` — what it is, install, quick start.
+- `docs/API.md` — the API reference and caveats; `docs/static-string.d2` is the
+  README diagram's source (`docs/static-string.svg` is rendered from it).
+- `examples/demo.cc` — a runnable tour (target `static_string_demo`).
 - `ARCHITECTURE.md` — internal design (the two flavors, integer_sequence
   concatenation, the `explode` template, `constexpr_assert`).
 
 ## Build & run the test
 
 ```sh
-c++ -std=c++17 -I. test/test.cc -o test/test && ./test/test
+c++ -std=c++20 -I. test/test.cc -o test/test && ./test/test
 # or:
 cmake -B build && cmake --build build && ctest --test-dir build
 ```
@@ -32,30 +36,30 @@ checks live.
 
 ## Conventions
 
-- C++17. The design leans on `std::integer_sequence`, `std::make_integer_sequence`,
+- C++20 (raised from C++17 in `43a2e67`). The design leans on `std::integer_sequence`, `std::make_integer_sequence`,
   variadic templates, and `__has_include`.
 - Header-only. Keep everything in `static_string.hh`; there is no `.cc` to
   compile for the library itself.
 - `constexpr`-heavy: constructors, operators, factories, and comparisons are all
   meant to work in constant evaluation. Anything new should too, unless it is
   deliberately a runtime escape hatch (like the `std::string` `operator+`
-  overloads at `static_string.hh:271`).
+  overloads).
 - Indentation is tabs, matching the existing source.
 - Use double quotes in code blocks per the docs' style.
 
 ## Invariants
 
 - In `static_string<N, T>`, `N` is the length **without** the null terminator.
-  The backing array is `N + 1` (`static_string.hh:78`, `:155`). Off-by-one here
+  The backing array is `N + 1`. Off-by-one here
   is the easiest mistake.
 - `string("literal")` produces `string_literal_ref<N_PLUS_1 - 1>`: it drops the
-  literal's null terminator from `N` (`static_string.hh:221`).
+  literal's null terminator from `N`.
 - `literal_ref` is non-owning; it holds a reference to the literal's storage and
   copies nothing. `char_array` is owning, with its own stack buffer. Every `+`
   result is a `char_array`.
 - For the `+` operators the sizes and types must line up. The two-operand
   constructor splits a result of size `N` at `M` and expects a left operand of
-  size `M` and a right of size `N - M` (`static_string.hh:159`,`:172`). The
+  size `M` and a right of size `N - M`. The
   operator overloads compute the result size as the sum of operand sizes; a
   mismatch is a compile error, not a silent bug.
 - Constructors assert their preconditions via `constexpr_assert`: the literal is
@@ -71,9 +75,9 @@ checks live.
 - Adding an `operator+` combination means adding an overload that wraps each
   operand into a `static_string` (a `string_literal_ref` for raw literals, a
   `string_char_array<1>` for chars) and forwards to the two-operand constructor
-  with the summed size, mirroring `static_string.hh:251`-`269`.
+  with the summed size, mirroring the existing `operator+` overloads.
 - Keep the accessor and comparison surface in sync across **both**
-  specializations (`static_string.hh:84` and `:185`); they are intentionally
+  specializations; they are intentionally
   duplicated.
 - Add a matching `assert` / `static_assert` block to `test/test.cc` for any new
   behavior, and prefer `static_assert` so the check runs at compile time.
@@ -82,15 +86,12 @@ checks live.
 
 - `N` excludes the null terminator but the buffer is `N + 1`. Mixing the two up
   corrupts sizes and termination.
-- `to_string<int>()` is non-negative only; there is no minus-sign path
-  (`static_string.hh:124`). `explode<0, 0>` exists specifically so `0` renders
+- `to_string<int>()` is non-negative only; there is no minus-sign path. `explode<0, 0>` exists specifically so `0` renders
   as `"0"` and not the empty string.
-- The runtime `std::string` `operator+` overloads (`static_string.hh:271`,
-  `:279`) silently catch any non-`static_string` operand. If a compile-time
+- The runtime `std::string` `operator+` overloads silently catch any non-`static_string` operand. If a compile-time
   concatenation unexpectedly allocates, an operand probably didn't match the
   `constexpr` overloads and fell through to these.
-- The `digits` of `explode` accumulate by **prepending** to the char pack
-  (`static_string.hh:124`); appending would reverse the number.
+- The `digits` of `explode` accumulate by **prepending** to the char pack; appending would reverse the number.
 - The `std::formatter` is gated on C++20 + `__has_include(<format>)` and off
   under `STATIC_STRING_NO_FORMAT`. It is a convenience only; `static_string`
   already converts to `std::string_view`.

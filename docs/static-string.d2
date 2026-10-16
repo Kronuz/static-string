@@ -1,0 +1,28 @@
+# static-string: two flavors, folded by the compiler into one constant.
+# Render: d2 --layout elk --sketch --theme 302 docs/static-string.d2 docs/static-string.svg
+direction: right
+
+lit: 'string("Hello, ")' {
+  label: "string(\"Hello, \")\nliteral_ref: a view, copies nothing"
+}
+lit2: 'string("world")' {
+  label: "string(\"world\")\nliteral_ref"
+}
+ch: "'!'" {
+  label: "'!'\na char"
+}
+plus: "+" {
+  shape: circle
+}
+out: result {
+  label: "static_string<13, char_array>\nowning, constexpr\n\"Hello, world!\""
+}
+runtime: runtime {
+  label: "const char* · string_view\nstd::string · std::format"
+}
+
+lit -> plus
+lit2 -> plus
+ch -> plus
+plus -> out: "at compile time"
+out -> runtime: "converts"
