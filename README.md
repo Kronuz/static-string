@@ -98,8 +98,6 @@ pass on every platform.
 
 ## 📄 License
 
-Boost Software License 1.0. Copyright (c) 2015-2019 Dubalu LLC and Copyright (c)
-2017 Andrzej Krzemienski, whose `constexpr` string work the `literal_ref` core
-derives from. See [LICENSE](LICENSE). Extracted from
-[Xapiand](https://github.com/Kronuz/Xapiand), where it builds the compile-time
-colors.
+Boost Software License 1.0. Copyright (c) 2017 Andrzej Krzemienski, (c) 2017-2019 Dubalu LLC and (c) 2026 Germán Méndez Bravo. See [LICENSE](LICENSE).
+
+The core entered Xapiand in [December 2017](https://github.com/Kronuz/Xapiand/commit/085939b9fa7581256203bcf162ab27194cc66c31) with Andrzej's notice and the full Boost license. The [February 2018 refactor](https://github.com/Kronuz/Xapiand/commit/82efa13ef7fef62a014b60dcaa50107d384d67f8) retains that provenance. The original 2015 start date for Dubalu was copied project boilerplate; this component starts in 2017. Later extensions retain BSL-1.0.
