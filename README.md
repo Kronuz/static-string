@@ -1,5 +1,7 @@
 # static-string
 
+Part of [Kronuz C++ Libraries](https://github.com/Kronuz/cpp-libraries), a collection of small, reusable C++ libraries.
+
 [![CI](https://github.com/Kronuz/static-string/actions/workflows/ci.yml/badge.svg)](https://github.com/Kronuz/static-string/actions/workflows/ci.yml)
 [![License: BSL-1.0](https://img.shields.io/badge/license-BSL--1.0-blue.svg)](LICENSE)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)
