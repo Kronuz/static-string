@@ -15,9 +15,9 @@ Notes for agents and contributors working in this repo.
   `ctest` test (built only when this repo is top-level).
 - `LICENSE` — Boost Software License 1.0; dual copyright (Dubalu LLC and
   Andrzej Krzemienski).
-- `README.md` — what it is, install, quick start.
-- `docs/API.md` — the API reference and caveats; `docs/static-string.d2` is the
-  README diagram's source (`docs/static-string.svg` is rendered from it).
+- `README.md` — what it is, quick start, install.
+- `CHANGELOG.md` — notable changes.
+- `docs/API.md` — the API reference and caveats.
 - `examples/demo.cc` — a runnable tour (target `static_string_demo`).
 - `ARCHITECTURE.md` — internal design (the two flavors, integer_sequence
   concatenation, the `explode` template, `constexpr_assert`).
