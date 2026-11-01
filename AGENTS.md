@@ -22,17 +22,29 @@ Notes for agents and contributors working in this repo.
 - `ARCHITECTURE.md` — internal design (the two flavors, integer_sequence
   concatenation, the `explode` template, `constexpr_assert`).
 
-## Build & run the test
+## Verification and benchmarks
+
+CI (`.github/workflows/ci.yml`) calls the catalog's shared
+[`cmake.yml`](https://github.com/Kronuz/cpp-libraries/blob/main/.github/workflows/cmake.yml) on every push and nightly:
+CTest on Linux (x86-64 GCC and Clang, arm64), macOS (arm64, x86-64) and FreeBSD, then again under
+ASan+UBSan and TSan. The shared method is the catalog's
+[PERFORMANCE.md](https://github.com/Kronuz/cpp-libraries/blob/main/docs/PERFORMANCE.md).
 
 ```sh
-c++ -std=c++20 -I. test/test.cc -o test/test && ./test/test
-# or:
-cmake -B build && cmake --build build && ctest --test-dir build
+cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
+c++ -std=c++20 -I. test/test.cc -o build/test_by_hand && build/test_by_hand   # without CMake
+# ASan+UBSan as CI's linux-asan-ubsan job runs it (Linux, Clang)
+CC=clang CXX=clang++ cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug \
+  "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -D_GLIBCXX_ASSERTIONS" \
+  "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+cmake --build build-asan && ASAN_OPTIONS=detect_leaks=1 ctest --test-dir build-asan --output-on-failure
 ```
 
-The test prints `static-string OK: ...` and exits 0 on success. It uses
-`assert` and `static_assert`, so build without `NDEBUG` to keep the runtime
-checks live.
+The test prints `static-string OK: ...` and exits 0. Its `static_assert`s check concatenation,
+`to_string<>` and comparison in constant evaluation, so a broken `constexpr` path fails the
+compile; its runtime checks are `assert`, which a Release build compiles out; the default (empty)
+build type keeps them. `./build/static_string_demo` runs the tour in `examples/demo.cc`. There
+is no bench, fuzz target or mutation script: the library makes no performance claim.
 
 ## Conventions
 
