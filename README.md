@@ -82,6 +82,8 @@ Not for:
 
 ## 📚 Documentation
 
+- [The Bag of Holding](https://kronuz.github.io/blog/bag-of-holding/):
+  the Familiars post that covers `static-string` among the small helpers.
 - [docs/API.md](docs/API.md): the two flavors, the factories, the operators, and the
   caveats.
 - [ARCHITECTURE.md](ARCHITECTURE.md): how concatenation and integer rendering unfold
